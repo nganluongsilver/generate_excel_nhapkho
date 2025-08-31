@@ -5,20 +5,308 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tool xuất file excel nhập kho Kiotviet</title>
   <style>
-    body{font-family: Arial, Helvetica, sans-serif; padding:8px; background:#f7f7f7}
-    h1{font-size:20px}
-    .row{display:flex;gap:8px;flex-wrap:wrap}
-    label{display:block;font-size:12px;margin-bottom:4px}
-    input,select,textarea{padding:6px;border:1px solid #ccc;border-radius:4px;font-size:16px}
-    .btn{padding:8px 12px;border-radius:6px;border:0;background:#2b78e4;color:#fff;cursor:pointer;font-size:16px}
-    .btn.ghost{background:#777}
-    .table-wrapper{overflow-x:auto;}
-    table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff;min-width:1200px}
-    th,td{padding:8px;border:1px solid #e2e2e2;font-size:13px;white-space:nowrap}
+    :root {
+      --bg: #f4f5f7;
+      --fg: #222;
+      --panel: #fff;
+      --border: #d1d5db;
+      --input-bg: #fff;
+      --input-fg: #222;
+      --input-border: #d1d5db;
+      --input-bg-readonly: #f4f5f7;
+      --input-fg-readonly: #888;
+      --btn: #3b82f6;
+      --btn-hover: #2563eb;
+      --btn-ghost: #e5e7eb;
+      --btn-ghost-hover: #d1d5db;
+      --btn-excel: #217346;
+      --btn-excel-hover: #145c2a;
+      --btn-delete: #fee2e2;
+      --btn-delete-hover: #ef4444;
+      --btn-delete-fg: #b91c1c;
+      --btn-delete-hover-fg: #fff;
+      --table-header: #f7f7fa;
+      --table-row-hover: #f2f4f8;
+      --shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15171a;
+        --fg: #fff;
+        --panel: #202226;
+        --border: #444a50;
+        --input-bg: #181a1b;
+        --input-fg: #fff;
+        --input-border: #444a50;
+        --input-bg-readonly: #23262b;
+        --input-fg-readonly: #e5e7eb;
+        --btn: #2563eb;
+        --btn-hover: #3b82f6;
+        --btn-ghost: #23262b;
+        --btn-ghost-hover: #353a40;
+        --btn-excel: #217346;
+        --btn-excel-hover: #145c2a;
+        --btn-delete: #3b1f1f;
+        --btn-delete-hover: #ef4444;
+        --btn-delete-fg: #f87171;
+        --btn-delete-hover-fg: #fff;
+        --table-header: #23262b;
+        --table-row-hover: #23262b;
+        --shadow: 0 2px 8px rgba(0,0,0,0.18);
+      }
+    }
+    body[data-theme="dark"] {
+      --bg: #15171a;
+      --fg: #fff;
+      --panel: #202226;
+      --border: #444a50;
+      --input-bg: #181a1b;
+      --input-fg: #fff;
+      --input-border: #444a50;
+      --input-bg-readonly: #23262b;
+      --input-fg-readonly: #e5e7eb;
+      --btn: #2563eb;
+      --btn-hover: #3b82f6;
+      --btn-ghost: #23262b;
+      --btn-ghost-hover: #353a40;
+      --btn-excel: #217346;
+      --btn-excel-hover: #145c2a;
+      --btn-delete: #3b1f1f;
+      --btn-delete-hover: #ef4444;
+      --btn-delete-fg: #f87171;
+      --btn-delete-hover-fg: #fff;
+      --table-header: #23262b;
+      --table-row-hover: #23262b;
+      --shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    body {
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      padding: 8px;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 10;
+      background: var(--btn-ghost);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-toggle:hover {
+      background: var(--btn-ghost-hover);
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+    input, select, textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      font-size: 16px;
+      background: var(--input-bg);
+      color: var(--input-fg);
+      outline: none;
+      transition: border 0.2s, background 0.2s, color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--btn);
+    }
+    .btn {
+      padding: 12px 20px;
+      border-radius: 6px;
+      border: none;
+      background: var(--btn);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .btn:hover {
+      background: var(--btn-hover);
+    }
+    .btn.ghost {
+      background: var(--btn-ghost);
+      color: var(--fg);
+    }
+    .btn.ghost:hover {
+      background: var(--btn-ghost-hover);
+    }
+    .btn.excel {
+      background: var(--btn-excel);
+      color: #fff;
+    }
+    .btn.excel:hover {
+      background: var(--btn-excel-hover);
+    }
+    .btn-delete {
+      background: var(--btn-delete);
+      color: var(--btn-delete-fg);
+      border: none;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .btn-delete:hover {
+      background: var(--btn-delete-hover);
+      color: var(--btn-delete-hover-fg);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: var(--panel);
+      margin-top: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      min-width: 900px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      white-space: nowrap;
+      text-align: left;
+    }
+    th {
+      background: var(--table-header);
+      font-weight: 600;
+      color: var(--fg);
+      border-top: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover td {
+      background: var(--table-row-hover);
+    }
+    td input, td select {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--input-bg);
+      color: var(--input-fg);
+    }
+    td input[readonly] {
+      background: var(--input-bg-readonly);
+      color: var(--input-fg-readonly);
+    }
+    /* Điều chỉnh kích thước cột */
+    th:nth-child(1), td:nth-child(1) { min-width: 36px; max-width: 40px; text-align: center; }
+    th:nth-child(2), td:nth-child(2) { min-width: 110px; }
+    th:nth-child(3), td:nth-child(3) { min-width: 160px; }
+    th:nth-child(4), td:nth-child(4) { min-width: 110px; }
+    th:nth-child(5), td:nth-child(5) { min-width: 200px; }
+    th:nth-child(6), td:nth-child(6) { min-width: 120px; }
+    th:nth-child(7), td:nth-child(7) { min-width: 110px; }
+    th:nth-child(8), td:nth-child(8) { min-width: 110px; }
+    th:nth-child(9), td:nth-child(9) { min-width: 110px; }
+    th:nth-child(10), td:nth-child(10) { min-width: 110px; }
+    th:nth-child(11), td:nth-child(11) { min-width: 110px; }
+    th:nth-child(12), td:nth-child(12) { min-width: 110px; }
+    th:nth-child(13), td:nth-child(13) { min-width: 110px; }
+    th:nth-child(14), td:nth-child(14) { min-width: 110px; }
+    th:nth-child(15), td:nth-child(15) { min-width: 110px; }
+    th:nth-child(16), td:nth-child(16) { min-width: 110px; }
+    th:nth-child(17), td:nth-child(17) { min-width: 110px; }
+    th:nth-child(18), td:nth-child(18) { min-width: 110px; }
+    th:nth-child(19), td:nth-child(19) { min-width: 110px; }
+    th:nth-child(20), td:nth-child(20) { min-width: 110px; }
+    th:nth-child(21), td:nth-child(21) { min-width: 110px; }
+    th:nth-child(22), td:nth-child(22) { min-width: 110px; }
+    th:nth-child(23), td:nth-child(23) { min-width: 110px; }
+    th:nth-child(24), td:nth-child(24) { min-width: 110px; }
+    th:nth-child(25), td:nth-child(25) { min-width: 110px; }
+    th:nth-child(26), td:nth-child(26) { min-width: 110px; }
+    th:nth-child(27), td:nth-child(27) { min-width: 80px; }
+    /* Responsive cho mobile */
+    @media (max-width: 900px) {
+      table { min-width: 700px; font-size: 14px; }
+      th, td { font-size: 14px; padding: 10px 6px; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 2px; }
+      h1 { font-size: 17px; }
+      .row { flex-direction: column; gap: 0; margin-bottom: 4px; }
+      label { font-size: 12px; }
+      input, select, textarea { font-size: 15px; padding: 8px 8px; }
+      .btn { font-size: 15px; padding: 10px 12px; }
+      table { min-width: 500px; font-size: 13px; }
+      th, td { font-size: 13px; padding: 8px 4px; }
+      /* Tăng khoảng cách giữa các mục nhập trên mobile */
+      .row > div { margin-bottom: 12px; }
+    }
+    /* Giới hạn select sản phẩm không bị tràn */
+    #ten_hang_select {
+      max-width: 100%;
+      min-width: 220px;
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Đảm bảo select trong bảng cũng không tràn */
+    td select.ten_hang {
+      max-width: 220px;
+      min-width: 120px;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    label { color: #111 !important; }
   </style>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" title="Chuyển chế độ sáng/tối" aria-label="Chuyển chế độ sáng/tối">
+    <span id="themeIcon"></span>
+  </button>
   <h1>Form xuất file excel nhập kho Kiotviet</h1>
   <p>Điền thông tin, bấm <strong>Thêm hàng</strong> để thêm dòng, sau đó <strong>Xuất Excel</strong>.</p>
 
@@ -63,7 +351,7 @@
       <div>
         <button class="btn" id="addRowBtn">Thêm hàng</button>
         <button class="btn ghost" id="clearBtn">Xoá bảng</button>
-        <button class="btn" id="exportBtn">Xuất Excel</button>
+        <button class="btn excel" id="exportBtn">Xuất Excel</button>
       </div>
     </div>
   </div>
@@ -135,6 +423,39 @@
     'Đồng Bạc Panda 30g 2024': '8.3 Chỉ'
   };
 
+  // Mapping ĐVT cố định cho Ancarat
+  const dvtAncarat = {
+    'Bạch Lân Thịnh Vượng 999 - 1 lượng': 'Miếng',
+    '80 năm Ngày Độc Lập 5 lượng .999 Silver Bar': 'Miếng',
+    'Bắc Sư Tử 999 - 1 lượng': 'Miếng',
+    'Ngân Long Quảng Tiến 999 - 1 lượng': 'Miếng',
+    'Bạc miếng Ancarat 999 - 1 lượng': 'Miếng',
+    'Bắc Sư Tử 999 - 5 lượng': 'Miếng',
+    'Bạc thỏi 2025 Ancarat 999 - 375 gram': 'Thỏi',
+    'Bạc thỏi 2025 Ancarat 999 - 500 gram': 'Thỏi',
+    'Bạc thỏi 2025 Ancarat 999 - 1000 gram': 'Thỏi',
+    'Bạc miếng 2024 Ancarat 999 - 5 lượng': 'Thỏi',
+    'Bạc miếng 2024 Ancarat 999 - 500 gram': 'Thỏi',
+    'Bạc miếng 2024 Ancarat 999 - 1000 gram': 'Thỏi',
+    "Father's Day 999 - miếng 5 chỉ": 'Miếng',
+    "Mother's Day 999 - miếng 5 chỉ": 'Miếng',
+    "Happy Womans Day 999 - miếng 5 chỉ": 'Miếng',
+    'Mã đáo thành công 999 - 1 lượng': 'Miếng',
+    'Nam Kim Thành 999 - miếng 1 lượng': 'Miếng',
+    'Bitcoin 999 - xu 1 lượng': 'Xu',
+    'Huế 999 - miếng 1 lượng': 'Miếng',
+    'Sài Gòn 999 - miếng 1 lượng': 'Miếng',
+    'Hà Nội 999 - miếng 1 lượng': 'Miếng',
+    'Hoa Khai Phú Quý 999 - miếng 1 lượng': 'Miếng',
+    'Mã đáo thành công 999 - thanh 10 lượng': 'Miếng',
+    '12 con giáp 999 - xu 1 chỉ': 'Xu',
+    'The Legend of Gióng 999 - miếng 5 chỉ': 'Miếng',
+    '50 năm giải phóng miền Nam 999 - miếng 5 chỉ': 'Miếng',
+    '1985 năm khởi nghĩa Hai Bà Trưng 999 - miếng 1 lượng': 'Miếng',
+    '50 năm giải phóng miền Nam 999 - miếng 1 lượng': 'Miếng',
+    "Hung Kings' Memorial Day 999 - miếng 5 chỉ": 'Miếng'
+  };
+
   const nhomSelect = document.getElementById('nhom_hang');
   const tenHangSelectForm = document.getElementById('ten_hang_select');
   const startNumberInput = document.getElementById('start_number');
@@ -151,19 +472,13 @@
 
   function namesForBrand(brand){
     if(brand === 'Phú Quý') return Object.keys(dvtPhuQuy);
-    if(brand === 'Ancarat') return [
-      'Bạc miếng Ancarat 999 - 1 lượng',
-      'Bạc miếng 2024 Ancarat 999 - 5 lượng',
-      'Bạc thỏi 2025 Ancarat 999 - 500 gram',
-      'Bitcoin 999 - xu 1 lượng',
-      "Mother's Day 999 - miếng 5 chỉ"
-    ];
+    if(brand === 'Ancarat') return Object.keys(dvtAncarat);
     return [];
   }
 
   function dvtsForBrand(brand){
     if(brand === 'Phú Quý') return []; // auto theo mapping
-    if(brand === 'Ancarat') return ['Miếng','Thỏi','Xu'];
+    if(brand === 'Ancarat') return []; // auto theo mapping
     return [];
   }
 
@@ -175,6 +490,144 @@
   }
   nhomSelect.addEventListener('change', updateTenHangSelectForm);
   updateTenHangSelectForm();
+
+  function updateDVTForRow(tr, brand, selectedTenHang, selectedDVT) {
+    const tenHangSelect = tr.querySelector('.ten_hang');
+    const dvtCell = tr.querySelector('.dvt_cell');
+    function doUpdate() {
+      const val = tenHangSelect.value;
+      if (brand === "Phú Quý") {
+        dvtCell.innerHTML = `<input class="dvt" value="${dvtPhuQuy[val] || ''}" readonly/>`;
+      } else if (brand === "Ancarat") {
+        dvtCell.innerHTML = `<input class="dvt" value="${dvtAncarat[val] || ''}" readonly/>`;
+      } else {
+        dvtCell.innerHTML = `<input class="dvt" value="" readonly/>`;
+      }
+    }
+    tenHangSelect.addEventListener('change', doUpdate);
+    doUpdate();
+  }
+
+  // --- LocalStorage helpers ---
+  function saveToLocal() {
+    const rows = [];
+    for(const tr of tbody.children){
+      const cells = tr.querySelectorAll('input,select');
+      rows.push({
+        loai_hang: cells[0].value,
+        nhom_hang: cells[1].value,
+        ma_hang: cells[2].value,
+        ten_hang: cells[3].value,
+        thuong_hieu: cells[4].value,
+        gia_ban: cells[5].value,
+        gia_von: cells[6].value,
+        ton_kho: cells[7].value,
+        du_kien_het_hang: cells[8].value,
+        ton_nho_nhat: cells[9].value,
+        ton_lon_nhat: cells[10].value,
+        dvt: (tr.querySelector('.dvt') ? tr.querySelector('.dvt').value : ''),
+        ma_dvt: tr.querySelector('.ma_dvt').value,
+        quy_doi: tr.querySelector('.quy_doi').value,
+        thuoc_tinh: tr.querySelector('.thuoc_tinh').value,
+        ma_hh_lien_quan: tr.querySelector('.ma_hh_lien_quan').value,
+        hinh_anh: tr.querySelector('.hinh_anh').value,
+        trong_luong: tr.querySelector('.trong_luong').value,
+        dang_kinh_doanh: tr.querySelector('.dang_kinh_doanh').value,
+        duoc_ban_truc_tiep: tr.querySelector('.duoc_ban_truc_tiep').value,
+        mo_ta: tr.querySelector('.mo_ta').value,
+        mau_ghi_chu: tr.querySelector('.mau_ghi_chu').value,
+        vi_tri: tr.querySelector('.vi_tri').value,
+        hang_thanh_phan: tr.querySelector('.hang_thanh_phan').value
+      });
+    }
+    const formVals = {
+      nhom_hang: nhomSelect.value,
+      ten_hang: tenHangSelectForm.value,
+      start_number: startNumberInput.value,
+      default_giavon: defaultGiavon.value,
+      default_tonkho: defaultTonkho.value
+    };
+    localStorage.setItem('nhapkho_rows', JSON.stringify(rows));
+    localStorage.setItem('nhapkho_form', JSON.stringify(formVals));
+  }
+  function loadFromLocal() {
+    const rows = JSON.parse(localStorage.getItem('nhapkho_rows')||'[]');
+    const formVals = JSON.parse(localStorage.getItem('nhapkho_form')||'{}');
+    if(formVals.nhom_hang) nhomSelect.value = formVals.nhom_hang;
+    updateTenHangSelectForm();
+    if(formVals.ten_hang) tenHangSelectForm.value = formVals.ten_hang;
+    if(formVals.start_number) startNumberInput.value = formVals.start_number;
+    if(formVals.default_giavon) defaultGiavon.value = formVals.default_giavon;
+    if(formVals.default_tonkho) defaultTonkho.value = formVals.default_tonkho;
+    tbody.innerHTML = '';
+    counter = 0;
+    for(const row of rows){
+      counter += 1;
+      const nhom = row.nhom_hang === 'Bạc tích trữ - Phú Quý' ? 'phuquy' : (row.nhom_hang === 'Bạc tích trữ - Ancarat' ? 'ancarat' : '');
+      const brand = brandForGroup(nhom);
+      const sku = row.ma_hang;
+      const products = namesForBrand(brand);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${counter}</td>
+        <td><input value="${row.loai_hang}"/></td>
+        <td><input value="${row.nhom_hang}"/></td>
+        <td><input class="sku" value="${sku}"/></td>
+        <td>
+          <select class="ten_hang">
+            ${products.map(n=>`<option${n===row.ten_hang? ' selected' : ''}>${n}</option>`).join('')}
+          </select>
+        </td>
+        <td><input class="thuong_hieu" value="${row.thuong_hieu}" readonly/></td>
+        <td><input class="gia_ban" type="number" value="${row.gia_ban}"/></td>
+        <td><input class="gia_von" type="number" value="${row.gia_von}"/></td>
+        <td><input class="ton_kho" type="number" value="${row.ton_kho}"/></td>
+        <td><input class="du_kien_het_hang" value="${row.du_kien_het_hang}"/></td>
+        <td><input class="ton_nho_nhat" type="number" value="${row.ton_nho_nhat}"/></td>
+        <td><input class="ton_lon_nhat" type="number" value="${row.ton_lon_nhat}"/></td>
+        <td class="dvt_cell"></td>
+        <td><input class="ma_dvt" value="${row.ma_dvt}"/></td>
+        <td><input class="quy_doi" type="number" value="${row.quy_doi}"/></td>
+        <td><input class="thuoc_tinh" value="${row.thuoc_tinh}"/></td>
+        <td><input class="ma_hh_lien_quan" value="${row.ma_hh_lien_quan}"/></td>
+        <td><input class="hinh_anh" value="${row.hinh_anh}"/></td>
+        <td><input class="trong_luong" value="${row.trong_luong}"/></td>
+        <td><input class="dang_kinh_doanh" value="${row.dang_kinh_doanh}"/></td>
+        <td><input class="duoc_ban_truc_tiep" value="${row.duoc_ban_truc_tiep}"/></td>
+        <td><input class="mo_ta" value="${row.mo_ta}"/></td>
+        <td><input class="mau_ghi_chu" value="${row.mau_ghi_chu}"/></td>
+        <td><input class="vi_tri" value="${row.vi_tri}"/></td>
+        <td><input class="hang_thanh_phan" value="${row.hang_thanh_phan}"/></td>
+        <td><button class="btn-delete" title="Xoá" onclick="removeRow(this)">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
+            <path d="M6.5 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M10 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M13.5 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="4.5" y="5.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M2.5 5.5H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M8 5.5V3.5C8 2.94772 8.44772 2.5 9 2.5H11C11.5523 2.5 12 2.94772 12 3.5V5.5" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button></td>
+      `;
+      tbody.appendChild(tr);
+      const tenHangSelect = tr.querySelector('.ten_hang');
+      const dvtCell = tr.querySelector('.dvt_cell');
+      function updateDVT(){
+        if(brand==="Phú Quý"){
+          const val = tenHangSelect.value;
+          dvtCell.innerHTML = `<input class="dvt" value="${dvtPhuQuy[val]||''}" readonly/>`;
+        }else{
+          dvtCell.innerHTML = `<input class="dvt" value="${dvtAncarat[tenHangSelect.value] || ''}" readonly/>`;
+        }
+      }
+      tenHangSelect.addEventListener('change', updateDVT);
+      updateDVT();
+    }
+    // Cập nhật lại số thứ tự
+    [...tbody.children].forEach((r,i)=> r.cells[0].innerText = i+1);
+    counter = tbody.children.length;
+  }
+  // --- END LocalStorage helpers ---
 
   function addRow(){
     counter += 1;
@@ -215,7 +668,16 @@
       <td><input class="mau_ghi_chu" value=""/></td>
       <td><input class="vi_tri" value=""/></td>
       <td><input class="hang_thanh_phan" value=""/></td>
-      <td><button onclick="removeRow(this)">Xoá</button></td>
+      <td><button class="btn-delete" title="Xoá" onclick="removeRow(this)">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
+          <path d="M6.5 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M10 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M13.5 8.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="4.5" y="5.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M2.5 5.5H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 5.5V3.5C8 2.94772 8.44772 2.5 9 2.5H11C11.5523 2.5 12 2.94772 12 3.5V5.5" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button></td>
     `;
     tbody.appendChild(tr);
     const tenHangSelect = tr.querySelector('.ten_hang');
@@ -225,11 +687,12 @@
         const val = tenHangSelect.value;
         dvtCell.innerHTML = `<input class="dvt" value="${dvtPhuQuy[val]||''}" readonly/>`;
       }else{
-        dvtCell.innerHTML = `<select class="dvt">${dvtsForBrand(brand).map(d=>`<option>${d}</option>`).join('')}</select>`;
+        dvtCell.innerHTML = `<input class="dvt" value="${dvtAncarat[tenHangSelect.value] || ''}" readonly/>`;
       }
     }
     tenHangSelect.addEventListener('change', updateDVT);
     updateDVT();
+    saveToLocal();
   }
 
   function removeRow(btn){
@@ -237,12 +700,14 @@
     tr.remove();
     [...tbody.children].forEach((r,i)=> r.cells[0].innerText = i+1);
     counter = tbody.children.length;
+    saveToLocal();
   }
 
   document.getElementById('addRowBtn').addEventListener('click', addRow);
   document.getElementById('clearBtn').addEventListener('click', ()=>{
     tbody.innerHTML = '';
     counter = 0;
+    saveToLocal();
   });
 
   document.getElementById('exportBtn').addEventListener('click', ()=>{
@@ -305,7 +770,42 @@
     XLSX.writeFile(wb, filename);
   });
 
-  addRow();
+  // Lưu form khi thay đổi
+  nhomSelect.addEventListener('change', ()=>{ updateTenHangSelectForm(); saveToLocal(); });
+  tenHangSelectForm.addEventListener('change', saveToLocal);
+  startNumberInput.addEventListener('input', saveToLocal);
+  defaultGiavon.addEventListener('input', saveToLocal);
+  defaultTonkho.addEventListener('input', saveToLocal);
+
+  // Lưu bảng khi chỉnh sửa các ô trong tbody
+  tbody.addEventListener('input', saveToLocal);
+  tbody.addEventListener('change', saveToLocal);
+
+  // Khôi phục dữ liệu khi load trang
+  loadFromLocal();
+
+  // Dark/Light mode toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  function setTheme(mode) {
+    document.body.setAttribute('data-theme', mode);
+    localStorage.setItem('theme', mode);
+    if(mode === 'dark') {
+      themeIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 14.5A7 7 0 0 1 7.5 5c0-.2 0-.4.02-.6A7 7 0 1 0 17 14.5Z" stroke="#f7fafc" stroke-width="2"/></svg>`;
+    } else {
+      themeIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="5" stroke="#222" stroke-width="2"/><line x1="11" y1="1" x2="11" y2="4" stroke="#222" stroke-width="2"/><line x1="11" y1="18" x2="11" y2="21" stroke="#222" stroke-width="2"/><line x1="1" y1="11" x2="4" y2="11" stroke="#222" stroke-width="2"/><line x1="18" y1="11" x2="21" y2="11" stroke="#222" stroke-width="2"/><line x1="5.64" y1="5.64" x2="7.76" y2="7.76" stroke="#222" stroke-width="2"/><line x1="14.24" y1="14.24" x2="16.36" y2="16.36" stroke="#222" stroke-width="2"/><line x1="5.64" y1="16.36" x2="7.76" y2="14.24" stroke="#222" stroke-width="2"/><line x1="14.24" y1="7.76" x2="16.36" y2="5.64" stroke="#222" stroke-width="2"/></svg>`;
+    }
+  }
+  function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  themeToggle.addEventListener('click', () => {
+    const current = document.body.getAttribute('data-theme') || getSystemTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+  // Init theme
+  const savedTheme = localStorage.getItem('theme');
+  setTheme(savedTheme || getSystemTheme());
 </script>
 </body>
 </html>
