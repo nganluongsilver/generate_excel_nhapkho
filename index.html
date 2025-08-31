@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tool xuất file excel nhập kho Kiotviet</title>
   <style>
-    body{font-family: Arial, Helvetica, sans-serif; padding:18px; background:#f7f7f7}
+    body{font-family: Arial, Helvetica, sans-serif; padding:8px; background:#f7f7f7}
     h1{font-size:20px}
     .row{display:flex;gap:8px;flex-wrap:wrap}
     label{display:block;font-size:12px;margin-bottom:4px}
-    input,select,textarea{padding:6px;border:1px solid #ccc;border-radius:4px}
-    .btn{padding:8px 12px;border-radius:6px;border:0;background:#2b78e4;color:#fff;cursor:pointer}
+    input,select,textarea{padding:6px;border:1px solid #ccc;border-radius:4px;font-size:16px}
+    .btn{padding:8px 12px;border-radius:6px;border:0;background:#2b78e4;color:#fff;cursor:pointer;font-size:16px}
     .btn.ghost{background:#777}
     .table-wrapper{overflow-x:auto;}
     table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff;min-width:1200px}
@@ -37,6 +37,10 @@
           <option value="phuquy">Bạc tích trữ - Phú Quý</option>
           <option value="ancarat">Bạc tích trữ - Ancarat</option>
         </select>
+      </div>
+      <div style="min-width:260px">
+        <label>Tên hàng</label>
+        <select id="ten_hang_select"></select>
       </div>
 
       <div style="min-width:160px">
@@ -132,6 +136,7 @@
   };
 
   const nhomSelect = document.getElementById('nhom_hang');
+  const tenHangSelectForm = document.getElementById('ten_hang_select');
   const startNumberInput = document.getElementById('start_number');
   const defaultGiavon = document.getElementById('default_giavon');
   const defaultTonkho = document.getElementById('default_tonkho');
@@ -162,16 +167,24 @@
     return [];
   }
 
+  function updateTenHangSelectForm() {
+    const nhom = nhomSelect.value;
+    const brand = brandForGroup(nhom);
+    const products = namesForBrand(brand);
+    tenHangSelectForm.innerHTML = products.map(n => `<option>${n}</option>`).join('');
+  }
+  nhomSelect.addEventListener('change', updateTenHangSelectForm);
+  updateTenHangSelectForm();
+
   function addRow(){
     counter += 1;
     const nhom = nhomSelect.value;
     const brand = brandForGroup(nhom);
     const startNum = parseInt(startNumberInput.value||0,10) + counter - 1;
     const sku = formatSKU(startNum);
-
+    const selectedTenHang = tenHangSelectForm.value;
     const tr = document.createElement('tr');
     const products = namesForBrand(brand);
-
     tr.innerHTML = `
       <td>${counter}</td>
       <td><input value="Hàng hoá"/></td>
@@ -179,7 +192,7 @@
       <td><input class="sku" value="${sku}"/></td>
       <td>
         <select class="ten_hang">
-          ${products.map(n=>`<option>${n}</option>`).join('')}
+          ${products.map(n=>`<option${n===selectedTenHang? ' selected' : ''}>${n}</option>`).join('')}
         </select>
       </td>
       <td><input class="thuong_hieu" value="${brand}" readonly/></td>
@@ -205,10 +218,8 @@
       <td><button onclick="removeRow(this)">Xoá</button></td>
     `;
     tbody.appendChild(tr);
-
     const tenHangSelect = tr.querySelector('.ten_hang');
     const dvtCell = tr.querySelector('.dvt_cell');
-
     function updateDVT(){
       if(brand==="Phú Quý"){
         const val = tenHangSelect.value;
@@ -243,8 +254,12 @@
 
     const data = [headers];
 
+    let hasPhuQuy = false, hasAncarat = false;
     for(const tr of tbody.children){
       const cells = tr.querySelectorAll('input,select');
+      const nhom = cells[1].value || '';
+      if(nhom.includes('Phú Quý')) hasPhuQuy = true;
+      if(nhom.includes('Ancarat')) hasAncarat = true;
       const row = [
         cells[0].value,
         cells[1].value,
@@ -274,10 +289,20 @@
       data.push(row);
     }
 
+    let groupStr = '';
+    if(hasPhuQuy && hasAncarat) groupStr = 'phuquy_ancarat';
+    else if(hasPhuQuy) groupStr = 'phuquy';
+    else if(hasAncarat) groupStr = 'ancarat';
+    else groupStr = 'other';
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const datetime = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const filename = `nhapkho_${groupStr}_${datetime}.xlsx`;
+
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, "phuquyancarat.xlsx");
+    XLSX.writeFile(wb, filename);
   });
 
   addRow();
